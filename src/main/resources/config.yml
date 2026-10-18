@@ -1,0 +1,17 @@
+# Intervalo (segundos) de atualização das tags automáticas (mínimo 5).
+refresh-seconds: 60
+
+# A ordem desta lista é a ordem de apresentação. Uma tag "unique" só tem um detentor.
+# "auto: richest" atribui a tag ao jogador mais rico.
+tags:
+  - id: magnata
+    text: "&6[Magnata]"
+    unique: true
+    auto: richest
+
+messages:
+  no-tag: "&cNão tens essa tag."
+  unknown-tag: "&cTag desconhecida."
+  now-visible: "&aTag visível."
+  now-hidden: "&eTag oculta."
+  unavailable: "&cSistema de tags indisponível."
