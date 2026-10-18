@@ -7,7 +7,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import pt.flawless.fapi.tags.TagSurface;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -16,10 +15,12 @@ public class TagsCommand implements CommandExecutor {
     private static final String ADMIN = "ftags.admin";
 
     private final TagsService service;
+    private final TagsMenu menu;
     private final TagsConfig config;
     private final Plugin plugin;
 
-    public TagsCommand(TagsService service, TagsConfig config, Plugin plugin) {
+    public TagsCommand(TagsService service, TagsMenu menu, TagsConfig config, Plugin plugin) {
+        this.menu = menu;
         this.service = service;
         this.config = config;
         this.plugin = plugin;
@@ -31,36 +32,23 @@ public class TagsCommand implements CommandExecutor {
         if (args.length > 0 && admin) {
             if (args[0].equalsIgnoreCase("add")) { change(sender, args, true); return true; }
             if (args[0].equalsIgnoreCase("remove")) { change(sender, args, false); return true; }
+            if (args[0].equalsIgnoreCase("help")) { help(sender); return true; }
         }
-        if (args.length > 1) {
-            sender.sendMessage(msg(admin ? "usage-general-admin" : "usage-general"));
+        if (args.length > 0) {
+            sender.sendMessage(msg("usage-general"));
             return true;
         }
-        if (!(sender instanceof Player)) {
-            sender.sendMessage("§cApenas jogadores podem usar este comando.");
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage(msg("players-only"));
             return true;
         }
-        Player player = (Player) sender;
-        if (args.length == 0) list(player); else toggle(player, args[0]);
+        menu.open(player);
         return true;
     }
 
-    private void list(Player player) {
-        service.list(player.getUniqueId()).whenComplete((owned, e) -> reply(player, e, () -> {
-            if (owned.isEmpty()) { player.sendMessage(msg("list-empty")); return; }
-            player.sendMessage(msg("list-header"));
-            for (OwnedTag o : owned) {
-                String text = config.find(o.tagId()).orElseThrow().text();
-                String state = msg(o.visibleChat() ? "state-visible" : "state-hidden");
-                player.sendMessage(msg("list-line").replace("{tag}", text).replace("{estado}", state));
-            }
-        }));
-    }
-
-    private void toggle(Player player, String tagId) {
-        if (config.find(tagId).isEmpty()) { player.sendMessage(msg("unknown-tag")); return; }
-        service.toggle(player.getUniqueId(), tagId, TagSurface.CHAT).whenComplete((state, e) -> reply(player, e, () ->
-                player.sendMessage(state.isEmpty() ? msg("no-tag") : msg(state.get() ? "now-visible" : "now-hidden"))));
+    private void help(CommandSender sender) {
+        sender.sendMessage(msg("help-header"));
+        for (String key : new String[]{"usage-add", "usage-remove", "usage-help"}) sender.sendMessage(msg(key));
     }
 
     private void change(CommandSender sender, String[] args, boolean add) {

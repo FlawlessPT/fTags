@@ -27,7 +27,9 @@ public class FTags extends JavaPlugin {
             EconomyApi economy = Economies.get();
             TagsService service = new TagsService(config, new SqlTagsRepository(database));
 
-            getCommand("tags").setExecutor(new TagsCommand(service, config, this));
+            TagsMenu menu = new TagsMenu(service, config, this);
+            getServer().getPluginManager().registerEvents(menu, this);
+            getCommand("tags").setExecutor(new TagsCommand(service, menu, config, this));
             getServer().getServicesManager().register(TagsApi.class, service, this, ServicePriority.Normal);
 
             RichestRefreshTask refresh = new RichestRefreshTask(service, economy, config,

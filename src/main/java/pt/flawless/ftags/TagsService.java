@@ -23,7 +23,7 @@ public class TagsService implements TagsApi {
     @Override
     public CompletableFuture<List<String>> getVisibleTags(UUID uuid, TagSurface surface) {
         return list(uuid).thenApply(owned -> owned.stream()
-                .filter(o -> surface == TagSurface.CHAT ? o.visibleChat() : o.visibleTab())
+                .filter(o -> o.visible(surface))
                 .map(o -> config.find(o.tagId()).orElseThrow().text())
                 .toList());
     }
@@ -45,7 +45,7 @@ public class TagsService implements TagsApi {
         return repository.findOwned(uuid).thenCompose(owned -> {
             Optional<OwnedTag> current = owned.stream().filter(o -> o.tagId().equals(tagId)).findFirst();
             if (current.isEmpty()) return CompletableFuture.completedFuture(Optional.<Boolean>empty());
-            boolean next = !(surface == TagSurface.CHAT ? current.get().visibleChat() : current.get().visibleTab());
+            boolean next = !current.get().visible(surface);
             return repository.setVisible(uuid, tagId, surface, next)
                     .thenApply(ok -> ok ? Optional.of(next) : Optional.<Boolean>empty());
         });

@@ -5,10 +5,10 @@ description: Tags de jogador
 depend: [fAPI, fDatabase, fEconomy]
 commands:
   tags:
-    description: Lista e gere as tuas tags (admins - add|remove <jogador> <tag>)
-    usage: "/tags [tag] | /tags add|remove <jogador> <tag>"
+    description: Abre o menu das tuas tags (admins - help, add, remove)
+    usage: "/tags"
     aliases: [tag]
 permissions:
   ftags.admin:
-    description: Permite /tags add e /tags remove
+    description: Permite /tags add, /tags remove e /tags help
     default: false

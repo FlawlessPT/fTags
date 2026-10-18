@@ -2,6 +2,7 @@ package pt.flawless.ftags;
 
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
+import pt.flawless.fapi.tags.TagSurface;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,11 +18,17 @@ public record TagsConfig(List<TagDefinition> tags, int refreshSeconds, Map<Strin
     private static final Map<String, String> DEFAULT_MESSAGES = Map.ofEntries(
             Map.entry("no-tag", "&cNão tens essa tag."),
             Map.entry("unknown-tag", "&cTag desconhecida."),
-            Map.entry("now-visible", "&aTag visível."),
-            Map.entry("now-hidden", "&eTag oculta."),
             Map.entry("unavailable", "&cSistema de tags indisponível."),
-            Map.entry("usage-general", "&eUso: /tags [tag]"),
-            Map.entry("usage-general-admin", "&eUso: /tags [tag] | /tags add|remove <jogador> <tag>"),
+            Map.entry("usage-general", "&eUso: /tags"),
+            Map.entry("usage-help", "&eUso: /tags help"),
+            Map.entry("help-header", "&6Comandos de admin:"),
+            Map.entry("players-only", "&cApenas jogadores."),
+            Map.entry("no-tags", "&7Não tens tags."),
+            Map.entry("menu-title", "Tags"),
+            Map.entry("glass-chat-visible", TagsMenuLayout.glassName(TagSurface.CHAT, true)),
+            Map.entry("glass-chat-hidden", TagsMenuLayout.glassName(TagSurface.CHAT, false)),
+            Map.entry("glass-tab-visible", TagsMenuLayout.glassName(TagSurface.TAB, true)),
+            Map.entry("glass-tab-hidden", TagsMenuLayout.glassName(TagSurface.TAB, false)),
             Map.entry("usage-add", "&eUso: /tags add <jogador> <tag>"),
             Map.entry("usage-remove", "&eUso: /tags remove <jogador> <tag>"),
             Map.entry("unknown-player", "&cJogador desconhecido."),
@@ -30,11 +37,6 @@ public record TagsConfig(List<TagDefinition> tags, int refreshSeconds, Map<Strin
             Map.entry("given", "&aTag {tag} &adada a {jogador}."),
             Map.entry("taken", "&aTag {tag} &aremovida a {jogador}."),
             Map.entry("received", "&aRecebeste a tag {tag}&a."),
-            Map.entry("list-header", "&6As tuas tags:"),
-            Map.entry("list-empty", "&7Não tens tags."),
-            Map.entry("list-line", "&7- {tag} &8(&f{estado}&8)"),
-            Map.entry("state-visible", "&avisível"),
-            Map.entry("state-hidden", "&7oculta"),
             Map.entry("error", "&cOcorreu um erro. Tenta mais tarde."));
 
     public static TagsConfig from(ConfigurationSection c) {
