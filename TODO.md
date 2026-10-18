@@ -11,3 +11,5 @@
 - fChat sem timeout se o fTags for lento (cache de tags).
 - O menu `/tags` mostra no máximo 9 tags (uma coluna cada), sem páginas.
 - O tab não tem consumidor ainda: a preferência `visible_tab` só é guardada e exposta via `getVisibleTags(uuid, TagSurface.TAB)`.
+- Toggle não atómico: cliques rápidos/duplo-clique num vidro podem perder uma alternância (ignorar cliques enquanto há um toggle em curso por vidro).
+- Pista `/tags help` para admins quando o subcomando não existe.

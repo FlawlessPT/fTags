@@ -6,7 +6,7 @@ depend: [fAPI, fDatabase, fEconomy]
 commands:
   tags:
     description: Abre o menu das tuas tags (admins - help, add, remove)
-    usage: "/tags"
+    usage: "/tags [help | add <jogador> <tag> | remove <jogador> <tag>]"
     aliases: [tag]
 permissions:
   ftags.admin:
