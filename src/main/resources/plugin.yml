@@ -1,0 +1,14 @@
+name: fTags
+main: pt.flawless.ftags.FTags
+version: 1.0
+description: Tags de jogador
+depend: [fAPI, fDatabase, fEconomy]
+commands:
+  tags:
+    description: Lista e gere as tuas tags (admins - add|remove <jogador> <tag>)
+    usage: "/tags [tag] | /tags add|remove <jogador> <tag>"
+    aliases: [tag]
+permissions:
+  ftags.admin:
+    description: Permite /tags add e /tags remove
+    default: false

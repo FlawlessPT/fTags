@@ -14,12 +14,28 @@ public record TagsConfig(List<TagDefinition> tags, int refreshSeconds, Map<Strin
 
     private static final int MIN_REFRESH = 5;
 
-    private static final Map<String, String> DEFAULT_MESSAGES = Map.of(
-            "no-tag", "&cNão tens essa tag.",
-            "unknown-tag", "&cTag desconhecida.",
-            "now-visible", "&aTag visível.",
-            "now-hidden", "&eTag oculta.",
-            "unavailable", "&cSistema de tags indisponível.");
+    private static final Map<String, String> DEFAULT_MESSAGES = Map.ofEntries(
+            Map.entry("no-tag", "&cNão tens essa tag."),
+            Map.entry("unknown-tag", "&cTag desconhecida."),
+            Map.entry("now-visible", "&aTag visível."),
+            Map.entry("now-hidden", "&eTag oculta."),
+            Map.entry("unavailable", "&cSistema de tags indisponível."),
+            Map.entry("usage-general", "&eUso: /tags [tag]"),
+            Map.entry("usage-general-admin", "&eUso: /tags [tag] | /tags add|remove <jogador> <tag>"),
+            Map.entry("usage-add", "&eUso: /tags add <jogador> <tag>"),
+            Map.entry("usage-remove", "&eUso: /tags remove <jogador> <tag>"),
+            Map.entry("unknown-player", "&cJogador desconhecido."),
+            Map.entry("already-has", "&c{jogador} já tem essa tag."),
+            Map.entry("not-owned", "&c{jogador} não tem essa tag."),
+            Map.entry("given", "&aTag {tag} &adada a {jogador}."),
+            Map.entry("taken", "&aTag {tag} &aremovida a {jogador}."),
+            Map.entry("received", "&aRecebeste a tag {tag}&a."),
+            Map.entry("list-header", "&6As tuas tags:"),
+            Map.entry("list-empty", "&7Não tens tags."),
+            Map.entry("list-line", "&7- {tag} &8(&f{estado}&8)"),
+            Map.entry("state-visible", "&avisível"),
+            Map.entry("state-hidden", "&7oculta"),
+            Map.entry("error", "&cOcorreu um erro. Tenta mais tarde."));
 
     public static TagsConfig from(ConfigurationSection c) {
         List<TagDefinition> tags = new ArrayList<>();
