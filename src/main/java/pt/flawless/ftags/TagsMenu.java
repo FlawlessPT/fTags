@@ -53,8 +53,14 @@ public class TagsMenu implements Listener {
             List<OwnedTag> shown = owned.size() > TagsMenuLayout.MAX_TAGS ? owned.subList(0, TagsMenuLayout.MAX_TAGS) : owned;
             if (shown.isEmpty()) { player.sendMessage(msg("no-tags")); return; }
             MenuHolder holder = new MenuHolder(shown.stream().map(OwnedTag::tagId).toList());
-            FInventory menu = new FInventory(holder, FInventorySize.SIZE_27, msg("menu-title"));
+            FInventory menu = new FInventory(holder, FInventorySize.SIZE_54, msg("menu-title"));
             holder.inventory = menu.getInventory();
+            for (int slot = 0; slot < TagsMenuLayout.SIZE; slot++) {
+                if (TagsMenuLayout.isBorder(slot)) {
+                    holder.inventory.setItem(slot, new FItemStack(Material.STAINED_GLASS_PANE, 1, " ")
+                            .setDurability((short) 7).createItem());
+                }
+            }
             for (int c = 0; c < shown.size(); c++) {
                 OwnedTag tag = shown.get(c);
                 menu.setItem(TagsMenuLayout.tagSlot(c),

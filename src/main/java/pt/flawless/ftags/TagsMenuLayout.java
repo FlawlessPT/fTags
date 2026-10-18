@@ -4,10 +4,13 @@ import pt.flawless.fapi.tags.TagSurface;
 
 import java.util.Optional;
 
-/** Disposição do menu /tags (27 slots): por coluna, o item da tag, o vidro do chat e o vidro do tab. Sem Bukkit. */
+/**
+ * Disposição do menu /tags (54 slots, 6 linhas) com borda de vidro. O interior são as linhas 1-4 e as colunas 1-7;
+ * por tag: item na linha 1, vidro do chat na linha 2, vidro do tab na linha 3 (linha 4 vazia). Sem Bukkit.
+ */
 final class TagsMenuLayout {
-    static final int MAX_TAGS = 9;
-    static final int SIZE = 27;
+    static final int MAX_TAGS = 7;
+    static final int SIZE = 54;
     private static final int ROW = 9;
 
     /** Vidro que alterna a visibilidade de uma superfície numa coluna. */
@@ -16,11 +19,11 @@ final class TagsMenuLayout {
     private TagsMenuLayout() {}
 
     static int tagSlot(int column) {
-        return column;
+        return ROW + 1 + column;
     }
 
     static int glassSlot(int column, TagSurface surface) {
-        return column + (surface == TagSurface.CHAT ? ROW : 2 * ROW);
+        return tagSlot(column) + (surface == TagSurface.CHAT ? ROW : 2 * ROW);
     }
 
     /** Data value do painel de vidro: 5 verde (visível), 14 vermelho (oculto). */
@@ -33,7 +36,14 @@ final class TagsMenuLayout {
     }
 
     static Optional<Target> targetOf(int slot) {
-        if (slot < ROW || slot >= SIZE) return Optional.empty();
-        return Optional.of(new Target(slot % ROW, slot < 2 * ROW ? TagSurface.CHAT : TagSurface.TAB));
+        int offset = slot - glassSlot(0, TagSurface.CHAT);
+        if (offset < 0 || offset >= 2 * ROW || offset % ROW >= MAX_TAGS) return Optional.empty();
+        return Optional.of(new Target(offset % ROW, offset < ROW ? TagSurface.CHAT : TagSurface.TAB));
+    }
+
+    /** Linhas 0 e 5, colunas 0 e 8. */
+    static boolean isBorder(int slot) {
+        int row = slot / ROW, col = slot % ROW;
+        return row == 0 || row == SIZE / ROW - 1 || col == 0 || col == ROW - 1;
     }
 }
