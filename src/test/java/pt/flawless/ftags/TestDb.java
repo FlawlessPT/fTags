@@ -32,25 +32,29 @@ public final class TestDb {
                 System.getenv("FLAWLESS_DB_PASSWORD"));
     }
 
-    /** Apaga so ftags_owned (nunca schema_version) e recria-a com o ficheiro V001. */
+    /** Apaga so ftags_owned (nunca schema_version) e recria-a com os ficheiros V001 e V002, por ordem. */
     public static void resetSchema(DatabaseService database) throws Exception {
-        String ddl = readMigration().trim();
-        if (ddl.endsWith(";")) {
-            ddl = ddl.substring(0, ddl.length() - 1);
-        }
-        String create = ddl;
+        String[] statements = {statement(readMigration("V001__create_owned.sql")),
+                statement(readMigration("V002__add_visible_tab.sql"))};
         database.runAsync(connection -> {
             try (Statement st = connection.createStatement()) {
                 st.execute("DROP TABLE IF EXISTS ftags_owned");
-                st.execute(create);
+                for (String sql : statements) {
+                    st.execute(sql);
+                }
             }
         }).get(30, TimeUnit.SECONDS);
     }
 
-    private static String readMigration() {
-        try (InputStream in = TestDb.class.getResourceAsStream("/db/ftags/V001__create_owned.sql")) {
+    private static String statement(String ddl) {
+        ddl = ddl.trim();
+        return ddl.endsWith(";") ? ddl.substring(0, ddl.length() - 1) : ddl;
+    }
+
+    private static String readMigration(String name) {
+        try (InputStream in = TestDb.class.getResourceAsStream("/db/ftags/" + name)) {
             if (in == null) {
-                throw new IllegalStateException("V001 nao encontrado no classpath");
+                throw new IllegalStateException(name + " nao encontrado no classpath");
             }
             return new String(in.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {

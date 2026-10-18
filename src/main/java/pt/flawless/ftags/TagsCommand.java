@@ -7,6 +7,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import pt.flawless.fapi.tags.TagSurface;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -50,7 +51,7 @@ public class TagsCommand implements CommandExecutor {
             player.sendMessage(msg("list-header"));
             for (OwnedTag o : owned) {
                 String text = config.find(o.tagId()).orElseThrow().text();
-                String state = msg(o.visible() ? "state-visible" : "state-hidden");
+                String state = msg(o.visibleChat() ? "state-visible" : "state-hidden");
                 player.sendMessage(msg("list-line").replace("{tag}", text).replace("{estado}", state));
             }
         }));
@@ -58,7 +59,7 @@ public class TagsCommand implements CommandExecutor {
 
     private void toggle(Player player, String tagId) {
         if (config.find(tagId).isEmpty()) { player.sendMessage(msg("unknown-tag")); return; }
-        service.toggle(player.getUniqueId(), tagId).whenComplete((state, e) -> reply(player, e, () ->
+        service.toggle(player.getUniqueId(), tagId, TagSurface.CHAT).whenComplete((state, e) -> reply(player, e, () ->
                 player.sendMessage(state.isEmpty() ? msg("no-tag") : msg(state.get() ? "now-visible" : "now-hidden"))));
     }
 

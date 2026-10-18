@@ -4,6 +4,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import pt.flawless.fapi.tags.TagSurface;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -56,23 +58,46 @@ class SqlTagsRepositoryIT {
         UUID a = UUID.randomUUID();
         get(repo.insert(a, "vip"));
         get(repo.insert(a, "rei"));
-        assertTrue(get(repo.setVisible(a, "rei", false)));
+        assertTrue(get(repo.setVisible(a, "rei", TagSurface.CHAT, false)));
         List<OwnedTag> owned = get(repo.findOwned(a));
         assertEquals(2, owned.size());
-        assertTrue(owned.contains(new OwnedTag("vip", true)));
-        assertTrue(owned.contains(new OwnedTag("rei", false)));
+        assertTrue(owned.contains(new OwnedTag("vip", true, true)));
+        assertTrue(owned.contains(new OwnedTag("rei", false, true)));
+    }
+
+    @Test
+    void setVisibleTabNaoAlteraChat() throws Exception {
+        UUID a = UUID.randomUUID();
+        get(repo.insert(a, "vip"));
+        assertTrue(get(repo.setVisible(a, "vip", TagSurface.TAB, false)));
+        assertEquals(List.of(new OwnedTag("vip", true, false)), get(repo.findOwned(a)));
+    }
+
+    @Test
+    void findOwnedDevolveAsDuasVisibilidades() throws Exception {
+        UUID a = UUID.randomUUID();
+        get(repo.insert(a, "vip"));
+        get(repo.setVisible(a, "vip", TagSurface.CHAT, false));
+        assertEquals(List.of(new OwnedTag("vip", false, true)), get(repo.findOwned(a)));
+    }
+
+    @Test
+    void insertTemAsDuasVisiveisPorOmissao() throws Exception {
+        UUID a = UUID.randomUUID();
+        get(repo.insert(a, "vip"));
+        assertEquals(List.of(new OwnedTag("vip", true, true)), get(repo.findOwned(a)));
     }
 
     @Test
     void setVisibleSemPossuirDevolveFalse() throws Exception {
-        assertFalse(get(repo.setVisible(UUID.randomUUID(), "vip", false)));
+        assertFalse(get(repo.setVisible(UUID.randomUUID(), "vip", TagSurface.CHAT, false)));
     }
 
     @Test
     void setVisibleParaMesmoValorDevolveTrue() throws Exception {
         UUID a = UUID.randomUUID();
         get(repo.insert(a, "vip"));
-        assertTrue(get(repo.setVisible(a, "vip", true)));
+        assertTrue(get(repo.setVisible(a, "vip", TagSurface.CHAT, true)));
     }
 
     @Test
@@ -82,7 +107,7 @@ class SqlTagsRepositoryIT {
         get(repo.insert(a, "rico"));
         assertTrue(get(repo.replaceHolder(b, "rico")));
         assertTrue(get(repo.findOwned(a)).isEmpty());
-        assertEquals(List.of(new OwnedTag("rico", true)), get(repo.findOwned(b)));
+        assertEquals(List.of(new OwnedTag("rico", true, true)), get(repo.findOwned(b)));
     }
 
     @Test
@@ -101,7 +126,7 @@ class SqlTagsRepositoryIT {
         get(repo.insert(b, "vip"));
         get(repo.insert(a, "rei"));
         get(repo.clear("vip"));
-        assertEquals(List.of(new OwnedTag("rei", true)), get(repo.findOwned(a)));
+        assertEquals(List.of(new OwnedTag("rei", true, true)), get(repo.findOwned(a)));
         assertTrue(get(repo.findOwned(b)).isEmpty());
     }
 }

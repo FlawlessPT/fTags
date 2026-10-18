@@ -1,6 +1,7 @@
 package pt.flawless.ftags;
 
 import pt.flawless.fapi.database.DatabaseService;
+import pt.flawless.fapi.tags.TagSurface;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,13 +18,14 @@ import java.util.concurrent.CompletableFuture;
  */
 public class SqlTagsRepository implements TagsRepository {
 
-    private static final String SELECT_OWNED = "SELECT tag_id, visible FROM ftags_owned WHERE uuid = ?";
+    private static final String SELECT_OWNED = "SELECT tag_id, visible, visible_tab FROM ftags_owned WHERE uuid = ?";
     private static final String INSERT = "INSERT IGNORE INTO ftags_owned (uuid, tag_id) VALUES (?, ?)";
     private static final String DELETE = "DELETE FROM ftags_owned WHERE uuid = ? AND tag_id = ?";
     private static final String LOCK_HOLDERS = "SELECT uuid FROM ftags_owned WHERE tag_id = ? FOR UPDATE";
     private static final String DELETE_TAG = "DELETE FROM ftags_owned WHERE tag_id = ?";
     private static final String EXISTS = "SELECT 1 FROM ftags_owned WHERE uuid = ? AND tag_id = ?";
-    private static final String SET_VISIBLE = "UPDATE ftags_owned SET visible = ? WHERE uuid = ? AND tag_id = ?";
+    private static final String SET_VISIBLE_CHAT = "UPDATE ftags_owned SET visible = ? WHERE uuid = ? AND tag_id = ?";
+    private static final String SET_VISIBLE_TAB = "UPDATE ftags_owned SET visible_tab = ? WHERE uuid = ? AND tag_id = ?";
 
     private final DatabaseService database;
 
@@ -39,7 +41,7 @@ public class SqlTagsRepository implements TagsRepository {
                 try (ResultSet rs = ps.executeQuery()) {
                     List<OwnedTag> owned = new ArrayList<>();
                     while (rs.next()) {
-                        owned.add(new OwnedTag(rs.getString(1), rs.getBoolean(2)));
+                        owned.add(new OwnedTag(rs.getString(1), rs.getBoolean(2), rs.getBoolean(3)));
                     }
                     return owned;
                 }
@@ -89,7 +91,12 @@ public class SqlTagsRepository implements TagsRepository {
     }
 
     @Override
-    public CompletableFuture<Boolean> setVisible(UUID uuid, String tagId, boolean visible) {
+    public CompletableFuture<Boolean> setVisible(UUID uuid, String tagId, TagSurface surface, boolean visible) {
+        // a coluna vem de um switch fixo: nunca se concatena input no SQL
+        String sql = switch (surface) {
+            case CHAT -> SET_VISIBLE_CHAT;
+            case TAB -> SET_VISIBLE_TAB;
+        };
         // SELECT prévio: o Connector/J devolve linhas encontradas (não alteradas) mas assim não depende disso
         return database.supplyAsync(connection -> {
             try (PreparedStatement ps = connection.prepareStatement(EXISTS)) {
@@ -101,7 +108,7 @@ public class SqlTagsRepository implements TagsRepository {
                     }
                 }
             }
-            try (PreparedStatement ps = connection.prepareStatement(SET_VISIBLE)) {
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
                 ps.setBoolean(1, visible);
                 ps.setString(2, uuid.toString());
                 ps.setString(3, tagId);

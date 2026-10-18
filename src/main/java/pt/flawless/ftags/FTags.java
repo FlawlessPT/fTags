@@ -23,7 +23,7 @@ public class FTags extends JavaPlugin {
             saveDefaultConfig();
             TagsConfig config = TagsConfig.from(getConfig());
             DatabaseService database = Databases.get();
-            database.migrate(this, List.of("db/ftags/V001__create_owned.sql"));
+            database.migrate(this, List.of("db/ftags/V001__create_owned.sql", "db/ftags/V002__add_visible_tab.sql"));
             EconomyApi economy = Economies.get();
             TagsService service = new TagsService(config, new SqlTagsRepository(database));
 

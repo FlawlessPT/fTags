@@ -1,5 +1,6 @@
 package pt.flawless.ftags;
 
+import pt.flawless.fapi.tags.TagSurface;
 import pt.flawless.fapi.tags.TagsApi;
 
 import java.util.ArrayList;
@@ -20,9 +21,9 @@ public class TagsService implements TagsApi {
     }
 
     @Override
-    public CompletableFuture<List<String>> getVisibleTags(UUID uuid) {
+    public CompletableFuture<List<String>> getVisibleTags(UUID uuid, TagSurface surface) {
         return list(uuid).thenApply(owned -> owned.stream()
-                .filter(OwnedTag::visible)
+                .filter(o -> surface == TagSurface.CHAT ? o.visibleChat() : o.visibleTab())
                 .map(o -> config.find(o.tagId()).orElseThrow().text())
                 .toList());
     }
@@ -39,13 +40,13 @@ public class TagsService implements TagsApi {
         return repository.delete(uuid, tagId);
     }
 
-    /** @return vazio se o jogador não possui a tag; senão o novo estado de visibilidade */
-    public CompletableFuture<Optional<Boolean>> toggle(UUID uuid, String tagId) {
+    /** @return vazio se o jogador não possui a tag; senão o novo estado de visibilidade nessa superfície */
+    public CompletableFuture<Optional<Boolean>> toggle(UUID uuid, String tagId, TagSurface surface) {
         return repository.findOwned(uuid).thenCompose(owned -> {
             Optional<OwnedTag> current = owned.stream().filter(o -> o.tagId().equals(tagId)).findFirst();
             if (current.isEmpty()) return CompletableFuture.completedFuture(Optional.<Boolean>empty());
-            boolean next = !current.get().visible();
-            return repository.setVisible(uuid, tagId, next)
+            boolean next = !(surface == TagSurface.CHAT ? current.get().visibleChat() : current.get().visibleTab());
+            return repository.setVisible(uuid, tagId, surface, next)
                     .thenApply(ok -> ok ? Optional.of(next) : Optional.<Boolean>empty());
         });
     }

@@ -4,6 +4,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import pt.flawless.fapi.tags.TagSurface;
+
 import java.io.StringReader;
 import java.util.List;
 import java.util.Optional;
@@ -57,7 +59,7 @@ class TagsServiceTest {
     void getVisibleTagsIgnoraOcultasEDesconhecidas() {
         service.give(a, "vip").join();
         service.give(a, "magnata").join();
-        service.toggle(a, "vip").join();
+        service.toggle(a, "vip", TagSurface.CHAT).join();
         repo.insert(a, "removida").join();
         assertEquals(List.of("§6[Magnata]"), service.getVisibleTags(a).join());
     }
@@ -65,9 +67,9 @@ class TagsServiceTest {
     @Test
     void giveDevolveFalseSeJaTinha() {
         assertTrue(service.give(a, "vip").join());
-        service.toggle(a, "vip").join();
+        service.toggle(a, "vip", TagSurface.CHAT).join();
         assertFalse(service.give(a, "vip").join());
-        assertEquals(List.of(new OwnedTag("vip", false)), repo.findOwned(a).join());
+        assertEquals(List.of(new OwnedTag("vip", false, true)), repo.findOwned(a).join());
     }
 
     @Test
@@ -104,13 +106,42 @@ class TagsServiceTest {
     @Test
     void toggleAlternaVisibilidade() {
         service.give(a, "vip").join();
-        assertEquals(Optional.of(false), service.toggle(a, "vip").join());
-        assertEquals(Optional.of(true), service.toggle(a, "vip").join());
+        assertEquals(Optional.of(false), service.toggle(a, "vip", TagSurface.CHAT).join());
+        assertEquals(Optional.of(true), service.toggle(a, "vip", TagSurface.CHAT).join());
+    }
+
+    @Test
+    void getVisibleTagsPorSuperficie() {
+        service.give(a, "vip").join();
+        service.toggle(a, "vip", TagSurface.CHAT).join();
+        assertEquals(List.of(), service.getVisibleTags(a, TagSurface.CHAT).join());
+        assertEquals(List.of("§a[VIP]"), service.getVisibleTags(a, TagSurface.TAB).join());
+        assertEquals(List.of(), service.getVisibleTags(a).join());
+    }
+
+    @Test
+    void toggleChatNaoAlteraTab() {
+        service.give(a, "vip").join();
+        service.toggle(a, "vip", TagSurface.CHAT).join();
+        assertEquals(new OwnedTag("vip", false, true), repo.findOwned(a).join().get(0));
+    }
+
+    @Test
+    void toggleTabNaoAlteraChat() {
+        service.give(a, "vip").join();
+        assertEquals(Optional.of(false), service.toggle(a, "vip", TagSurface.TAB).join());
+        assertEquals(new OwnedTag("vip", true, false), repo.findOwned(a).join().get(0));
+    }
+
+    @Test
+    void giveInicialVisivelNasDuas() {
+        service.give(a, "vip").join();
+        assertEquals(new OwnedTag("vip", true, true), service.list(a).join().get(0));
     }
 
     @Test
     void toggleSemPossuirDevolveEmpty() {
-        assertEquals(Optional.empty(), service.toggle(a, "vip").join());
+        assertEquals(Optional.empty(), service.toggle(a, "vip", TagSurface.CHAT).join());
     }
 
     @Test
