@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS ftags_owned (
+    uuid    CHAR(36) CHARACTER SET ascii NOT NULL,
+    tag_id  VARCHAR(32) NOT NULL,
+    visible BOOLEAN NOT NULL DEFAULT TRUE,
+    PRIMARY KEY (uuid, tag_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
