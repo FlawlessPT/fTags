@@ -13,3 +13,4 @@
 - O tab não tem consumidor ainda: a preferência `visible_tab` só é guardada e exposta via `getVisibleTags(uuid, TagSurface.TAB)`.
 - Toggle não atómico: cliques rápidos/duplo-clique num vidro podem perder uma alternância (ignorar cliques enquanto há um toggle em curso por vidro).
 - Pista `/tags help` para admins quando o subcomando não existe.
+- Anúncio de novo detentor só no refresh automático (não no `/tags add`); os placeholders não incluem o detentor anterior.

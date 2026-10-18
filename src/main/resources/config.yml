@@ -8,6 +8,13 @@ tags:
     text: "&6[Magnata]"
     unique: true
     auto: richest
+    # Anúncio a todos quando o detentor muda ({jogador}, {tag}, {saldo}); sem a chave ou lista vazia = sem anúncio.
+    announce:
+      - ""
+      - "&6&l★ NOVO MAGNATA ★"
+      - "&e{jogador} &7é agora o jogador mais rico do servidor!"
+      - "&7Saldo: &f{saldo}"
+      - ""
 
 messages:
   no-tag: "&cNão tens essa tag."

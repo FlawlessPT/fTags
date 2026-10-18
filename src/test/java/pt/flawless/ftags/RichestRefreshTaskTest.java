@@ -29,6 +29,9 @@ class RichestRefreshTaskTest {
     InMemoryTagsRepository repo = new InMemoryTagsRepository();
     List<Throwable> errors = new ArrayList<>();
     CompletableFuture<Optional<UUID>> richest;
+    List<UUID> announced = new ArrayList<>();
+    List<String> announcedTags = new ArrayList<>();
+    boolean announceThrows;
     RichestRefreshTask task;
     UUID a = UUID.randomUUID();
 
@@ -44,7 +47,11 @@ class RichestRefreshTaskTest {
             public String format(long c) { throw new UnsupportedOperationException(); }
             public CompletableFuture<Optional<UUID>> getRichest() { return richest; }
         };
-        task = new RichestRefreshTask(service, economy, config, errors::add);
+        task = new RichestRefreshTask(service, economy, config, (tag, uuid) -> {
+            announcedTags.add(tag.id());
+            announced.add(uuid);
+            if (announceThrows) throw new IllegalStateException("anuncio");
+        }, errors::add);
     }
 
     @Test
@@ -70,5 +77,41 @@ class RichestRefreshTaskTest {
         task.run();
         assertTrue(repo.rows.containsKey(new InMemoryTagsRepository.Key(a, "magnata")));
         assertEquals(1, errors.size());
+    }
+
+    @Test
+    void anunciaQuandoMuda() {
+        richest = CompletableFuture.completedFuture(Optional.of(a));
+        task.run();
+        assertEquals(List.of("magnata"), announcedTags);
+        assertEquals(List.of(a), announced);
+    }
+
+    @Test
+    void naoAnunciaSeIgual() {
+        repo.insert(a, "magnata");
+        richest = CompletableFuture.completedFuture(Optional.of(a));
+        task.run();
+        assertTrue(announced.isEmpty());
+    }
+
+    @Test
+    void naoAnunciaQuandoLimpa() {
+        repo.insert(a, "magnata");
+        richest = CompletableFuture.completedFuture(Optional.empty());
+        task.run();
+        assertTrue(announced.isEmpty());
+    }
+
+    @Test
+    void falhaNoAnuncioNaoCaiATarefa() {
+        announceThrows = true;
+        richest = CompletableFuture.completedFuture(Optional.of(a));
+        task.run();
+        assertTrue(repo.rows.containsKey(new InMemoryTagsRepository.Key(a, "magnata")));
+        assertEquals(1, errors.size());
+        richest = CompletableFuture.completedFuture(Optional.of(UUID.randomUUID()));
+        task.run();
+        assertEquals(2, announced.size());
     }
 }

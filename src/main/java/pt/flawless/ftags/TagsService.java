@@ -62,11 +62,15 @@ public class TagsService implements TagsApi {
         });
     }
 
-    /** Presente: dá a tag a esse jogador; vazio: ninguém a tem. */
-    public CompletableFuture<Void> applyRichest(String tagId, Optional<UUID> richest) {
+    /**
+     * Presente: dá a tag a esse jogador; vazio: ninguém a tem.
+     *
+     * @return {@code true} se o detentor mudou; {@code false} se era o mesmo ou a tag ficou sem detentor
+     */
+    public CompletableFuture<Boolean> applyRichest(String tagId, Optional<UUID> richest) {
         return richest.isPresent()
-                ? give(richest.get(), tagId).thenApply(b -> (Void) null)
-                : repository.clear(tagId);
+                ? give(richest.get(), tagId)
+                : repository.clear(tagId).thenApply(v -> false);
     }
 
     private TagDefinition require(String tagId) {

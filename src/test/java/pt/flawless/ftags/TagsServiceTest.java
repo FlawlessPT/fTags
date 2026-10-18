@@ -22,6 +22,9 @@ class TagsServiceTest {
                 text: "&6[Magnata]"
                 unique: true
                 auto: richest
+                announce:
+                  - "&e{jogador}"
+                  - ""
               - id: vip
                 text: "&a[VIP]"
             """;
@@ -42,8 +45,8 @@ class TagsServiceTest {
     @Test
     void configLeTagsERefreshMinimo() {
         assertEquals(5, config.refreshSeconds());
-        assertEquals(new TagDefinition("magnata", "§6[Magnata]", true, "richest"), config.tags().get(0));
-        assertEquals(new TagDefinition("vip", "§a[VIP]", false, null), config.tags().get(1));
+        assertEquals(new TagDefinition("magnata", "§6[Magnata]", true, "richest", List.of("§e{jogador}", "")), config.tags().get(0));
+        assertEquals(new TagDefinition("vip", "§a[VIP]", false, null, List.of()), config.tags().get(1));
         assertTrue(config.find("nada").isEmpty());
         assertNotNull(config.messages().get("no-tag"));
     }
@@ -152,5 +155,14 @@ class TagsServiceTest {
         assertTrue(repo.findOwned(a).join().isEmpty());
         service.applyRichest("magnata", Optional.empty()).join();
         assertTrue(repo.findOwned(b).join().isEmpty());
+    }
+
+    @Test
+    void applyRichestDevolveTrueSoQuandoMuda() {
+        assertTrue(service.applyRichest("magnata", Optional.of(a)).join());
+        assertFalse(service.applyRichest("magnata", Optional.of(a)).join());
+        assertTrue(service.applyRichest("magnata", Optional.of(b)).join());
+        assertFalse(service.applyRichest("magnata", Optional.empty()).join());
+        assertTrue(repo.rows.isEmpty());
     }
 }

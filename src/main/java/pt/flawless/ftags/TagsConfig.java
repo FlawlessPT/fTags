@@ -51,13 +51,22 @@ public record TagsConfig(List<TagDefinition> tags, int refreshSeconds, Map<Strin
                     String.valueOf(id),
                     ChatColor.translateAlternateColorCodes('&', String.valueOf(text)),
                     unique != null && Boolean.parseBoolean(String.valueOf(unique)),
-                    auto == null ? null : String.valueOf(auto)));
+                    auto == null ? null : String.valueOf(auto),
+                    announceLines(m.get("announce"))));
         }
         int refresh = Math.max(MIN_REFRESH, c.getInt("refresh-seconds", 60));
         Map<String, String> messages = new HashMap<>();
         DEFAULT_MESSAGES.forEach((k, v) ->
                 messages.put(k, ChatColor.translateAlternateColorCodes('&', c.getString("messages." + k, v))));
         return new TagsConfig(List.copyOf(tags), refresh, Map.copyOf(messages));
+    }
+
+    /** Ausente ou que não seja lista = sem anúncio (uma config antiga não tem a chave). */
+    private static List<String> announceLines(Object raw) {
+        if (!(raw instanceof List<?> list)) return List.of();
+        return list.stream()
+                .map(l -> ChatColor.translateAlternateColorCodes('&', l == null ? "" : String.valueOf(l)))
+                .toList();
     }
 
     public Optional<TagDefinition> find(String id) {
