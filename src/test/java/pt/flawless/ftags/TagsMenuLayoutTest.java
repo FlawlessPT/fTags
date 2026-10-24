@@ -23,8 +23,8 @@ class TagsMenuLayoutTest {
 
     @Test
     void vidroVerdeEVermelho() {
-        assertEquals(5, TagsMenuLayout.glassData(true));
-        assertEquals(14, TagsMenuLayout.glassData(false));
+        assertEquals(org.bukkit.Material.LIME_STAINED_GLASS_PANE, TagsMenuLayout.glassMaterial(true));
+        assertEquals(org.bukkit.Material.RED_STAINED_GLASS_PANE, TagsMenuLayout.glassMaterial(false));
     }
 
     @Test

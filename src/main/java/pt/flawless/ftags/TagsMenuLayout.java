@@ -26,9 +26,9 @@ final class TagsMenuLayout {
         return tagSlot(column) + (surface == TagSurface.CHAT ? ROW : 2 * ROW);
     }
 
-    /** Data value do painel de vidro: 5 verde (visível), 14 vermelho (oculto). */
-    static int glassData(boolean visible) {
-        return visible ? 5 : 14;
+    /** Painel de vidro: verde (visível), vermelho (oculto). */
+    static org.bukkit.Material glassMaterial(boolean visible) {
+        return visible ? org.bukkit.Material.LIME_STAINED_GLASS_PANE : org.bukkit.Material.RED_STAINED_GLASS_PANE;
     }
 
     static String glassName(TagSurface surface, boolean visible) {

@@ -57,8 +57,7 @@ public class TagsMenu implements Listener {
             holder.inventory = menu.getInventory();
             for (int slot = 0; slot < TagsMenuLayout.SIZE; slot++) {
                 if (TagsMenuLayout.isBorder(slot)) {
-                    holder.inventory.setItem(slot, new FItemStack(Material.STAINED_GLASS_PANE, 1, " ")
-                            .setDurability((short) 7).createItem());
+                    holder.inventory.setItem(slot, new FItemStack(Material.GRAY_STAINED_GLASS_PANE, 1, " ").createItem());
                 }
             }
             for (int c = 0; c < shown.size(); c++) {
@@ -101,8 +100,7 @@ public class TagsMenu implements Listener {
     private void setGlass(Inventory inventory, int column, TagSurface surface, boolean visible) {
         String name = msg("glass-" + surface.name().toLowerCase() + (visible ? "-visible" : "-hidden"));
         inventory.setItem(TagsMenuLayout.glassSlot(column, surface),
-                new FItemStack(Material.STAINED_GLASS_PANE, 1, name)
-                        .setDurability((short) TagsMenuLayout.glassData(visible)).createItem());
+                new FItemStack(TagsMenuLayout.glassMaterial(visible), 1, name).createItem());
     }
 
     private void fail(Player player, Throwable error) {

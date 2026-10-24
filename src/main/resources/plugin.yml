@@ -1,6 +1,7 @@
 name: fTags
 main: pt.flawless.ftags.FTags
 version: 1.0
+api-version: '1.21'
 description: Tags de jogador
 depend: [fAPI, fDatabase, fEconomy]
 commands:
