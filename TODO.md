@@ -14,3 +14,5 @@
 - Toggle não atómico: cliques rápidos/duplo-clique num vidro podem perder uma alternância (ignorar cliques enquanto há um toggle em curso por vidro).
 - Pista `/tags help` para admins quando o subcomando não existe.
 - Anúncio de novo detentor só no refresh automático (não no `/tags add`); os placeholders não incluem o detentor anterior.
+
+- Reload de config exige `/freload plugin` (o `TagsConfig` é partilhado por serviço, menu, comando e tarefa do mais rico).
